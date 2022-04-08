@@ -11,4 +11,6 @@ pip install pyscilab
 
 ## More info
 
-View on the Python Package Index (PyPI) [here](https://pypi.org/project/pyscilab/).
+View on the _Python Package Index_ (PyPI) [here](https://pypi.org/project/pyscilab/).
+
+View on _GitHub_ [here](https://github.com/bfrangi/pyscilab).
