@@ -3,8 +3,6 @@ from math import log10, floor
 from typing import Tuple
 import decimal
 
-from zmq import EVENT_CLOSE_FAILED
-
 def round_sig(num:float, sig:int=1) -> Tuple[float, int]:
 	'''
 	Rounds num to sig significant digits
