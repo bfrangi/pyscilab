@@ -3,6 +3,8 @@ from math import log10, floor
 from typing import Tuple
 import decimal
 
+from zmq import EVENT_CLOSE_FAILED
+
 def round_sig(num:float, sig:int=1) -> Tuple[float, int]:
 	'''
 	Rounds num to sig significant digits
@@ -94,12 +96,89 @@ def exponential_to_latex(val:float) -> str:
 	return latex_val
 
 
+def latex_exp_common_fact(val:str, val_exponent:str, err:str, err_exponent:str) -> str:# This does NOT work!!
+	'''
+	Simplifies expressions of value-error pairs so that they are both multiplied by
+	just one exponential instead of each by their own exponential. Output is given as 
+	LaTeX code.
+
+	Ex: latex_exp_common_fact("0.2123", "2", "0.6", "1") returns "( 2.123 \pm 0.6) \cdot 10^{1}"
+
+			Parameters:
+					val (float): Value without the exponential part
+					val_exponent (float): Exponent of the exponential part of val
+					err (float): Error of val without the exponential part
+					err_exponent (float): Exponent of the exponential part of err
+			
+			Returns:
+					val_and_err_latex (str): Simplified value + error in LaTeX code
+					with only one exponential for both the value and its error.
+
+	'''
+	val, val_exponent, err, err_exponent = float(val), int(val_exponent), float(err), int(err_exponent)
+	common_exponent = max(val_exponent, err_exponent)
+
+	val = val / 10**(common_exponent - val_exponent)
+	err = err / 10**(common_exponent - err_exponent)
+
+	while val//1 == 0:
+		val = float(re.sub( r'([0123456789]+)\.([0123456789])', r'\g<1>\g<2>.', str(val)))
+		err = float(re.sub( r'([0123456789]+)\.([0123456789])', r'\g<1>\g<2>.', str(err)))
+		common_exponent -= 1
+
+	return f"( {val}" + f" \\pm {err}) \\cdot 10^" + "{" + str(common_exponent) + "}"
+
+
 def latex_table(data:dict) -> str:
+	'''
+	Returns a LaTeX table generated from the given data dictionary.
+
+			Parameters:
+					data (dict): Dictionary with the data to plot. It should have the
+					following structure:
+
+					data = {
+						"caption":"Enter here the caption for the table",
+						"label":"Enter here the label for the table",
+						"float": "h",	# Enter float option here
+						"data":{# Here, the data for the different columns should be given
+								# You can add as many as you need.
+							"Col 1": [List with the values for Col 1],
+							"Col 1_error": [List with the values of the error for Col 1],
+							"Col 1_header": "Column 1 Header",
+							"Col 2": [List with the values for Col 2],
+							"Col 2_error": [List with the values of the error for Col 2],
+							"Col 2_header": "Column 2 Header",
+							...
+						}
+					}
+
+					All headers and captions may contain latex code. Specifying the 'float' 
+					option is optional. Giving error data is also optional, and the name of 
+					the columns can be any, as long as it is consistent for the column data, 
+					error data and column header. For example, this is valid:
+
+					data = {
+						"caption":"Example table",
+						"label":"tab-1",
+						"float": "h",
+						"data":{
+							"My First Column": [10, 20, 30, 40, 50, 60, 70, 80],
+							"My First Column_error": [1, 0.2, 3, 4, 2, 0.002, 3, 5],
+							"My First Column_header": "Column 1 Header",
+							"My Second Column": [1, 2, 3, 4, 5, 6, 7, 8],
+							"My Second Column_header": "Column 2 Header",
+						}
+					}
+
+					All columns must contain the same number of elements, as is also
+					the case with the errors.
+	'''
 	table ='''
-\\begin{table}[H]
+\\begin{table}float-placeholder
 	\\centering
 	\\begin{tabular}{ alignment-tabs-placeholder } \\hline
-		headers-placeholder \\\\ \\toprule
+		headers-placeholder \\\\ \\hline
 		data-placeholder \\hline
 	\\end{tabular}
 	\\caption{ caption-placeholder }
@@ -140,7 +219,7 @@ def latex_table(data:dict) -> str:
 				val, err = round_with_error(val, err)
 				val, err = exponential_to_latex(val), exponential_to_latex(err)
 				x = "$" + val + " \\pm " + err + "$"
-				x = re.sub(r'([^ \$]+) \\cdot 10\^\{([-0123456789]+)\} \\pm ([^ ]+) \\cdot 10\^\{([-0123456789]+)\}', lambda m: simplify(m.group(1),m.group(2), m.group(3), m.group(4)), x)
+				x = re.sub(r'([^ \$]+) \\cdot 10\^\{([-0123456789]+)\} \\pm ([^ ]+) \\cdot 10\^\{([-0123456789]+)\}', lambda m: latex_exp_common_fact(m.group(1),m.group(2), m.group(3), m.group(4)), x)
 				val_and_err.append(x)
 		else:
 			val_and_err = ["$" + str(val) + "$" for val in column]
@@ -160,6 +239,10 @@ def latex_table(data:dict) -> str:
 	table = re.sub('label-placeholder', data['label'], table)
 	table = re.sub('alignment-tabs-placeholder', alignment_tabs, table)
 	table = re.sub('headers-placeholder', headers_line, table)
+	if 'float' in data.keys():
+		table = re.sub('float-placeholder', "[" + data['float'] + "]", table)
+	else:
+		table = re.sub('float-placeholder', '', table)
 	table_list = table.split("\t\tdata-placeholder")
 	table = table_list[0] + data_lines + table_list[1]
 
