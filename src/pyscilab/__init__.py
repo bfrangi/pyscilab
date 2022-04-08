@@ -1,1 +1,0 @@
-from pyscilab import *
