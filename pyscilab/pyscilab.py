@@ -94,7 +94,7 @@ def exponential_to_latex(val:float) -> str:
 	return latex_val
 
 
-def latex_exp_common_fact(val:str, val_exponent:str, err:str, err_exponent:str) -> str:# This does NOT work!!
+def latex_exp_common_fact(val:str, val_exponent:str, err:str, err_exponent:str) -> str:
 	'''
 	Simplifies expressions of value-error pairs so that they are both multiplied by
 	just one exponential instead of each by their own exponential. Output is given as 
