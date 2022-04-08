@@ -1,0 +1,9 @@
+README.md
+setup.cfg
+setup.py
+pyscilab.egg-info/PKG-INFO
+pyscilab.egg-info/SOURCES.txt
+pyscilab.egg-info/dependency_links.txt
+pyscilab.egg-info/top_level.txt
+src/pyscilab/__init__.py
+src/pyscilab/pyscilab.py

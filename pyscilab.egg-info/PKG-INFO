@@ -1,0 +1,23 @@
+Metadata-Version: 2.1
+Name: pyscilab
+Version: 1.0.5.dev1
+Summary: Package including useful methods to process data from laboratory experiments
+Home-page: https://github.com/bfrangi/pyscilab.git
+Author: Bernat Frangi
+Author-email: bernat.frangi@gmail.com
+License: GNU General Public License v3.0
+Project-URL: Source, https://github.com/bfrangi/pyscilab
+Keywords: laboratory utility latex
+Platform: UNKNOWN
+Classifier: Development Status :: 3 - Alpha
+Classifier: Intended Audience :: Science/Research
+Classifier: Intended Audience :: Education
+Classifier: License :: OSI Approved :: GNU General Public License v3 (GPLv3)
+Classifier: Programming Language :: Python :: 3
+Classifier: Topic :: Education
+Classifier: Topic :: Scientific/Engineering
+Classifier: Topic :: Utilities
+Requires-Python: >=3
+
+UNKNOWN
+
